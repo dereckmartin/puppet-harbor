@@ -307,8 +307,8 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
     guest_groups = resource[:guest_groups]
     guest_groups_to_delete = current_guest_groups - guest_groups
     guest_groups_to_add = guest_groups - current_guest_groups
-    remove_guest_groups_from_project(project_id, member_groups_to_delete) unless member_groups_to_delete.empty?
-    add_guest_groups_to_project(project_id, member_groups_to_add) unless member_groups_to_add.empty?
+    remove_guest_groups_from_project(project_id, guest_groups_to_delete) unless guest_groups_to_delete.empty?
+    add_guest_groups_to_project(project_id, guest_groups_to_add) unless guest_groups_to_add.empty?
   end
 
   def remove_member_groups_from_project(project_id, group_names)
