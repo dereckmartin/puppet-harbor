@@ -211,6 +211,11 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
     add_members_to_project(id, members_to_add) unless members_to_add.empty?
   end
 
+  def guests
+    id = get_project_id_by_name(resource[:name])
+    self.class.get_project_member_names(id)
+  end
+
   def remove_members_from_project(project_id, member_names)
     api_instance = self.class.do_login
     member_names.sort!
@@ -237,7 +242,7 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
     end
   end
 
-  def add_members_to_project(project_id, guest_names)
+  def add_guests_to_project(project_id, guest_names)
     guest_names.sort!
     guest_names.each do |name|
       opts = { project_member: { role_id: 3, member_user: { "username": name.to_s } } } # role_id 3 == 'Guest'
@@ -271,17 +276,26 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
     add_member_groups_to_project(project_id, member_groups_to_add) unless member_groups_to_add.empty?
   end
 
+  def guest_groups
+    id = get_project_id_by_name(resource[:name])
+    self.class.get_project_member_group_names(id)
+  end
+
   def guest_groups=(_value)
     project_id = get_project_id_by_name(resource[:name])
-    curren-guest_groups = self.class.get_project_member_group_names(project_id)
+    current_guest_groups = self.class.get_project_member_group_names(project_id)
     guest_groups = resource[:guest_groups]
     guest_groups_to_delete = current_guest_groups - guest_groups
     guest_groups_to_add = guest_groups - current_guest_groups
-    remove_member_groups_from_project(project_id, member_groups_to_delete) unless member_groups_to_delete.empty?
-    add_member_groups_to_project(project_id, member_groups_to_add) unless member_groups_to_add.empty?
+    remove_guest_groups_from_project(project_id, member_groups_to_delete) unless member_groups_to_delete.empty?
+    add_guest_groups_to_project(project_id, member_groups_to_add) unless member_groups_to_add.empty?
   end
 
   def remove_member_groups_from_project(project_id, group_names)
+    remove_members_from_project(project_id, group_names)
+  end
+
+  def remove_guest_groups_from_project(project_id, group_names)
     remove_members_from_project(project_id, group_names)
   end
 
