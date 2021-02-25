@@ -120,7 +120,7 @@ describe Puppet::Type.type(:harbor_project) do
             it "should support array of string values: #{value}" do
               expect { described_class.new({
                 :name  => 'the_project',
-                :guest => value,
+                :guests => value,
               }) }.to_not raise_error
             end
           end
