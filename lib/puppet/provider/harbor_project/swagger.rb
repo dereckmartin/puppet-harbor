@@ -57,7 +57,20 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
     names
   end
 
+  def self.get_project_guest_names(project_id)
+    members = get_project_guests_with_entity_type(project_id, 'u')
+    names = members.map { |m| m.entity_name }
+    names.sort!.delete('admin')
+    names
+  end
+
   def self.get_project_members_with_entity_type(project_id, type)
+    api_instance = do_login
+    members_and_groups = api_instance[:legacy_client].projects_project_id_members_get(project_id)
+    members_and_groups.select { |m| m.entity_type == type }
+  end
+
+  def self.get_project_guests_with_entity_type(project_id, type)
     api_instance = do_login
     members_and_groups = api_instance[:legacy_client].projects_project_id_members_get(project_id)
     members_and_groups.select { |m| m.entity_type == type }
@@ -65,6 +78,13 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
 
   def self.get_project_member_group_names(project_id)
     members = get_project_members_with_entity_type(project_id, 'g')
+    names = members.map { |m| m.entity_name }
+    names.sort!
+    names
+  end
+
+  def self.get_project_guest_group_names(project_id)
+    members = get_project_guests_with_entity_type(project_id, 'g')
     names = members.map { |m| m.entity_name }
     names.sort!
     names
