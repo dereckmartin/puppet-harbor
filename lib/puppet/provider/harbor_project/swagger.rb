@@ -155,7 +155,7 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
       guest_groups = resource[:guest_groups]
       add_guest_groups_to_project(id, guest_groups)
     end
-  ends
+  end
 
   def get_project_id_by_name(project_name)
     project = get_project_with_name(resource[:name])
