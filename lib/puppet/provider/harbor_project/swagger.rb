@@ -167,7 +167,7 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
       member_groups = resource[:member_groups]
       add_member_groups_to_project(id, member_groups)
     end
-    unless resource[:guest].nil?
+    unless resource[:guests].nil?
       guests = resource[:guests]
       add_guests_to_project(id, guests)
     end
