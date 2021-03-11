@@ -50,41 +50,37 @@ Puppet::Type.type(:harbor_project).provide(:swagger) do
      PuppetX::Walkamongus::Harbor::Client.do_login
   end
 
+  def self.get_project_members_with_entity_type_and_role_id(project_id, entity_type, role_id)
+    api_instance = do_login
+    members_and_groups = api_instance[:legacy_client].projects_project_id_members_get(project_id)
+    with_entity_type = members_and_groups.select { |m| m.entity_type == type }
+    with_role_id = with_entity_type.select { |m| m.role_id == role_id }
+  end
+
   def self.get_project_member_names(project_id)
-    members = get_project_members_with_entity_type(project_id, 'u')
+    members = get_project_members_with_entity_type_and_role_id(project_id, 'u', 2)
     names = members.map { |m| m.entity_name }
     names.sort!.delete('admin')
     names
-  end
-
-  def self.get_project_guest_names(project_id)
-    members = get_project_guests_with_entity_type(project_id, 'u')
-    names = members.map { |m| m.entity_name }
-    names.sort!.delete('admin')
-    names
-  end
-
-  def self.get_project_members_with_entity_type(project_id, type)
-    api_instance = do_login
-    members_and_groups = api_instance[:legacy_client].projects_project_id_members_get(project_id)
-    members_and_groups.select { |m| m.entity_type == type }
-  end
-
-  def self.get_project_guests_with_entity_type(project_id, type)
-    api_instance = do_login
-    members_and_groups = api_instance[:legacy_client].projects_project_id_members_get(project_id)
-    members_and_groups.select { |m| m.entity_type == type }
   end
 
   def self.get_project_member_group_names(project_id)
-    members = get_project_members_with_entity_type(project_id, 'g')
+    members = get_project_members_with_entity_type_and_role_id(project_id, 'g', 2)
     names = members.map { |m| m.entity_name }
+    names = members.map { |m| m.}
     names.sort!
     names
   end
 
+  def self.get_project_guest_names(project_id)
+    members = get_project_members_with_entity_type_and_role_id(project_id, 'u', 3)
+    names = members.map { |m| m.entity_name }
+    names.sort!.delete('admin')
+    names
+  end
+
   def self.get_project_guest_group_names(project_id)
-    members = get_project_guests_with_entity_type(project_id, 'g')
+    members = get_project_members_with_entity_type_and_role_id(project_id, 'g', 3)
     names = members.map { |m| m.entity_name }
     names.sort!
     names
